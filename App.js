@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React from 'react';
+import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -7,6 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { ProductProvider } from './context/ProductContext';
 import { CurrencyProvider } from './context/CurrencyContext';
+import WelcomeScreen from './screens/WelcomeScreen';
 
 // Import Screens
 import HomeScreen from './screens/HomeScreen';
@@ -21,6 +22,12 @@ const Stack = createStackNavigator();
 // App Navigator Component
 const AppNavigator = () => {
   const { isDarkMode, colors } = useTheme();
+  const [showWelcome, setShowWelcome] = useState(true);
+
+  // If welcome screen is still showing, render it
+  if (showWelcome) {
+    return <WelcomeScreen onFinish={() => setShowWelcome(false)} />;
+  }
 
   return (
     <>
