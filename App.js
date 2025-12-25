@@ -12,6 +12,7 @@ import HomeScreen from './screens/HomeScreen';
 import CategoryProductsScreen from './screens/CategoryProductsScreen';
 import AddProductScreen from './screens/AddProductScreen';
 import ComparisonScreen from './screens/ComparisonScreen';
+import CartScreen from './screens/CartScreen';
 
 // Create Stack Navigator
 const Stack = createStackNavigator();
@@ -41,6 +42,12 @@ const AppNavigator = () => {
           <Stack.Screen 
             name="CategoryProducts" 
             component={CategoryProductsScreen}
+          />
+          
+          {/* Cart/Bill Calculator Screen */}
+          <Stack.Screen 
+            name="Cart" 
+            component={CartScreen}
           />
           
           {/* Add/Edit Product Screen */}

@@ -48,10 +48,10 @@ const Header = ({ title, rightButton, onRightButtonPress }) => {
           {/* Optional right button */}
           {rightButton && (
             <TouchableOpacity 
-              onPress={onRightButtonPress}
-              style={[styles.iconButton, { backgroundColor: colors.primary }]}
+              onPress={rightButton.onPress || onRightButtonPress}
+              style={[styles.iconButton, { backgroundColor: 'transparent', borderWidth: 2, borderColor: colors.border }]}
             >
-              <Text style={styles.iconWhite}>{rightButton}</Text>
+              <Text style={styles.icon}>{rightButton.icon || rightButton}</Text>
             </TouchableOpacity>
           )}
         </View>

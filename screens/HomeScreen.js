@@ -118,8 +118,14 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header with logo */}
-      <Header title="Categories" />
+      {/* Header with logo and cart button */}
+      <Header 
+        title="Categories"
+        rightButton={{
+          icon: '🛒',
+          onPress: () => navigation.navigate('Cart')
+        }}
+      />
 
       {/* Category list */}
       <FlatList
