@@ -30,6 +30,8 @@ const AddProductScreen = ({ navigation, route }) => {
   const [price, setPrice] = useState('');
   const [quantity, setQuantity] = useState('');
   const [unit, setUnit] = useState('g');
+  const [discount, setDiscount] = useState('');
+  const [notes, setNotes] = useState('');
 
   // Available units
   const units = ['g', 'kg', 'ml', 'L', 'pcs'];
@@ -41,6 +43,8 @@ const AddProductScreen = ({ navigation, route }) => {
       setPrice(productToEdit.price.toString());
       setQuantity(productToEdit.quantity.toString());
       setUnit(productToEdit.unit);
+      setDiscount(productToEdit.discount ? productToEdit.discount.toString() : '');
+      setNotes(productToEdit.notes || '');
     }
   }, [productToEdit]);
 
@@ -48,10 +52,15 @@ const AddProductScreen = ({ navigation, route }) => {
   const calculatePreviewUnitPrice = () => {
     const numPrice = parseFloat(price);
     const numQuantity = parseFloat(quantity);
+    const numDiscount = parseFloat(discount) || 0;
     
     if (isNaN(numPrice) || isNaN(numQuantity) || numQuantity === 0) {
       return 'Enter values to see unit price';
     }
+
+    // Apply discount
+    const discountAmount = (numPrice * numDiscount) / 100;
+    const finalPrice = numPrice - discountAmount;
 
     let normalizedQuantity = numQuantity;
     
@@ -64,7 +73,7 @@ const AddProductScreen = ({ navigation, route }) => {
         break;
     }
 
-    const unitPrice = numPrice / normalizedQuantity;
+    const unitPrice = finalPrice / normalizedQuantity;
     
     let displayUnit = '';
     switch(unit.toLowerCase()) {
@@ -99,10 +108,10 @@ const AddProductScreen = ({ navigation, route }) => {
 
     // Save product
     if (isEditing) {
-      updateProduct(categoryId, productToEdit.id, brand.trim(), price, quantity, unit);
+      updateProduct(categoryId, productToEdit.id, brand.trim(), price, quantity, unit, discount || 0, notes.trim());
       Alert.alert('Success', 'Product updated successfully');
     } else {
-      addProduct(categoryId, brand.trim(), price, quantity, unit);
+      addProduct(categoryId, brand.trim(), price, quantity, unit, discount || 0, notes.trim());
       Alert.alert('Success', 'Product added successfully');
     }
 
@@ -229,6 +238,33 @@ const AddProductScreen = ({ navigation, route }) => {
             </View>
           </View>
 
+          {/* Discount (Optional) */}
+          <View style={styles.inputGroup}>
+            <Text style={[styles.label, { color: colors.text }]}>
+              Discount (%) - Optional
+            </Text>
+            <TextInput
+              style={[
+                styles.input, 
+                { 
+                  backgroundColor: colors.inputBackground,
+                  borderColor: colors.inputBorder,
+                  color: colors.inputText
+                }
+              ]}
+              placeholder="e.g., 10 for 10% off"
+              placeholderTextColor={colors.textSecondary}
+              value={discount}
+              onChangeText={setDiscount}
+              keyboardType="decimal-pad"
+            />
+            {discount && parseFloat(discount) > 0 && (
+              <Text style={[styles.discountInfo, { color: colors.success }]}>
+                💰 You save {discount}%! Final price: {formatPrice((parseFloat(price) * (100 - parseFloat(discount))) / 100)}
+              </Text>
+            )}
+          </View>
+
           {/* Unit Price Preview */}
           <View style={[styles.previewContainer, { backgroundColor: colors.secondary + '15', borderColor: colors.secondary }]}>
             <Text style={[styles.previewLabel, { color: colors.textSecondary }]}>
@@ -240,6 +276,31 @@ const AddProductScreen = ({ navigation, route }) => {
             <Text style={[styles.previewHint, { color: colors.textSecondary }]}>
               This helps you compare prices fairly
             </Text>
+          </View>
+
+          {/* Notes (Optional) */}
+          <View style={styles.inputGroup}>
+            <Text style={[styles.label, { color: colors.text }]}>
+              Notes - Optional
+            </Text>
+            <TextInput
+              style={[
+                styles.input,
+                styles.notesInput,
+                { 
+                  backgroundColor: colors.inputBackground,
+                  borderColor: colors.inputBorder,
+                  color: colors.inputText
+                }
+              ]}
+              placeholder="e.g., Great taste, Good quality, Fresh"
+              placeholderTextColor={colors.textSecondary}
+              value={notes}
+              onChangeText={setNotes}
+              multiline
+              numberOfLines={3}
+              textAlignVertical="top"
+            />
           </View>
 
           {/* Action Buttons */}
@@ -366,6 +427,15 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  discountInfo: {
+    fontSize: 13,
+    marginTop: 6,
+    fontWeight: '600',
+  },
+  notesInput: {
+    minHeight: 80,
+    paddingTop: 14,
   },
 });
 

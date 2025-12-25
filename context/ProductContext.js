@@ -43,6 +43,7 @@ export const ProductProvider = ({ children }) => {
       id: Date.now().toString(),
       name: name,
       products: [],
+      pinned: false,
       createdAt: new Date().toISOString(),
     };
     setCategories([...categories, newCategory]);
@@ -66,15 +67,31 @@ export const ProductProvider = ({ children }) => {
     setSelectedProducts(selectedProducts.filter(id => !productIds.includes(id)));
   };
 
+  // Toggle pin status of a category
+  const togglePinCategory = (categoryId) => {
+    setCategories(categories.map(cat =>
+      cat.id === categoryId
+        ? { ...cat, pinned: !cat.pinned }
+        : cat
+    ));
+  };
+
   // Add a product to a category
-  const addProduct = (categoryId, brand, price, quantity, unit) => {
+  const addProduct = (categoryId, brand, price, quantity, unit, discount = 0, notes = '') => {
+    const numPrice = parseFloat(price);
+    const discountAmount = (numPrice * parseFloat(discount)) / 100;
+    const finalPrice = numPrice - discountAmount;
+    
     const newProduct = {
       id: Date.now().toString(),
       brand: brand || '',
-      price: parseFloat(price),
+      price: numPrice,
+      discount: parseFloat(discount),
+      finalPrice: finalPrice,
       quantity: parseFloat(quantity),
       unit: unit,
-      unitPrice: calculateUnitPrice(parseFloat(price), parseFloat(quantity), unit),
+      unitPrice: calculateUnitPrice(finalPrice, parseFloat(quantity), unit),
+      notes: notes || '',
       createdAt: new Date().toISOString(),
     };
 
@@ -86,7 +103,11 @@ export const ProductProvider = ({ children }) => {
   };
 
   // Update a product
-  const updateProduct = (categoryId, productId, brand, price, quantity, unit) => {
+  const updateProduct = (categoryId, productId, brand, price, quantity, unit, discount = 0, notes = '') => {
+    const numPrice = parseFloat(price);
+    const discountAmount = (numPrice * parseFloat(discount)) / 100;
+    const finalPrice = numPrice - discountAmount;
+    
     setCategories(categories.map(cat =>
       cat.id === categoryId
         ? {
@@ -96,10 +117,13 @@ export const ProductProvider = ({ children }) => {
                 ? {
                     ...product,
                     brand: brand || '',
-                    price: parseFloat(price),
+                    price: numPrice,
+                    discount: parseFloat(discount),
+                    finalPrice: finalPrice,
                     quantity: parseFloat(quantity),
                     unit: unit,
-                    unitPrice: calculateUnitPrice(parseFloat(price), parseFloat(quantity), unit),
+                    unitPrice: calculateUnitPrice(finalPrice, parseFloat(quantity), unit),
+                    notes: notes || '',
                   }
                 : product
             )
@@ -210,6 +234,7 @@ export const ProductProvider = ({ children }) => {
     addCategory,
     updateCategory,
     deleteCategory,
+    togglePinCategory,
     addProduct,
     updateProduct,
     deleteProduct,

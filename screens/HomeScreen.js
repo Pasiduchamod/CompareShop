@@ -23,8 +23,16 @@ const HomeScreen = ({ navigation }) => {
   const { 
     categories, 
     addCategory,
-    deleteCategory 
+    deleteCategory,
+    togglePinCategory
   } = useProducts();
+
+  // Sort categories: pinned first, then by creation date
+  const sortedCategories = [...categories].sort((a, b) => {
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
 
   // Add new category
   const handleAddCategory = () => {
@@ -81,13 +89,24 @@ const HomeScreen = ({ navigation }) => {
         onPress={() => handleOpenCategory(item)}
         onLongPress={() => handleDeleteCategory(item.id, item.name)}
       >
-        <View style={styles.categoryIcon}>
-          <Text style={styles.categoryIconText}>📦</Text>
-        </View>
+        <TouchableOpacity
+          style={styles.categoryIcon}
+          onPress={() => togglePinCategory(item.id)}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Text style={styles.categoryIconText}>{item.pinned ? '⭐' : '☆'}</Text>
+        </TouchableOpacity>
         <View style={styles.categoryInfo}>
-          <Text style={[styles.categoryName, { color: colors.text }]}>
-            {item.name}
-          </Text>
+          <View style={styles.categoryNameRow}>
+            <Text style={[styles.categoryName, { color: colors.text }]}>
+              {item.name}
+            </Text>
+            {item.pinned && (
+              <View style={[styles.pinnedBadge, { backgroundColor: colors.primary }]}>
+                <Text style={styles.pinnedBadgeText}>Pinned</Text>
+              </View>
+            )}
+          </View>
           <Text style={[styles.categoryCount, { color: colors.textSecondary }]}>
             {productCount} {productCount === 1 ? 'item' : 'items'}
           </Text>
@@ -104,7 +123,7 @@ const HomeScreen = ({ navigation }) => {
 
       {/* Category list */}
       <FlatList
-        data={categories}
+        data={sortedCategories}
         renderItem={renderCategory}
         keyExtractor={item => item.id}
         contentContainerStyle={[
@@ -230,18 +249,42 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   categoryIconText: {
-    fontSize: 24,
+    fontSize: 28,
+    lineHeight: 32,
   },
   categoryInfo: {
     flex: 1,
   },
+  categoryNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+    flexWrap: 'wrap',
+  },
   categoryName: {
     fontSize: 18,
     fontWeight: '600',
-    marginBottom: 4,
+    marginRight: 8,
+  },
+  pinnedBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+  },
+  pinnedBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
   categoryCount: {
     fontSize: 14,
+  },
+  pinButton: {
+    padding: 8,
+    marginRight: 4,
+  },
+  pinIcon: {
+    fontSize: 20,
   },
   categoryArrow: {
     fontSize: 24,

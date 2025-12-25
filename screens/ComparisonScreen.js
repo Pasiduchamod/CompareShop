@@ -79,10 +79,28 @@ const ComparisonScreen = ({ navigation, route }) => {
 
         {/* Price Section */}
         <View style={styles.priceSection}>
-          <Text style={[styles.priceLabel, { color: colors.textSecondary }]}>Total Price</Text>
-          <Text style={[styles.priceValue, { color: colors.text }]}>
+          <Text style={[styles.priceLabel, { color: colors.textSecondary }]}>
+            {product.discount > 0 ? 'Original Price' : 'Total Price'}
+          </Text>
+          <Text style={[
+            styles.priceValue, 
+            { 
+              color: colors.text,
+              textDecorationLine: product.discount > 0 ? 'line-through' : 'none'
+            }
+          ]}>
             {formatPrice(product.price)}
           </Text>
+          {product.discount > 0 && (
+            <>
+              <Text style={[styles.discountBadge, { color: colors.success }]}>
+                -{product.discount}% OFF
+              </Text>
+              <Text style={[styles.finalPrice, { color: colors.success }]}>
+                Final: {formatPrice(product.finalPrice)}
+              </Text>
+            </>
+          )}
         </View>
 
         {/* Quantity Section */}
@@ -126,6 +144,18 @@ const ComparisonScreen = ({ navigation, route }) => {
           <View style={[styles.savingsSection, { backgroundColor: colors.error + '10' }]}>
             <Text style={[styles.expensiveText, { color: colors.error }]}>
               Most Expensive
+            </Text>
+          </View>
+        )}
+
+        {/* Notes Section */}
+        {product.notes && (
+          <View style={[styles.notesSection, { backgroundColor: colors.inputBackground }]}>
+            <Text style={[styles.notesLabel, { color: colors.textSecondary }]}>
+              📝 Notes:
+            </Text>
+            <Text style={[styles.notesText, { color: colors.text }]} numberOfLines={2}>
+              {product.notes}
             </Text>
           </View>
         )}
@@ -313,6 +343,30 @@ const styles = StyleSheet.create({
   expensiveText: {
     fontSize: 14,
     fontWeight: '600',
+  },
+  discountBadge: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginTop: 4,
+  },
+  finalPrice: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 4,
+  },
+  notesSection: {
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 12,
+  },
+  notesLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  notesText: {
+    fontSize: 14,
+    lineHeight: 20,
   },
   footer: {
     position: 'absolute',

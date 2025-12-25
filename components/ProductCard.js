@@ -39,10 +39,22 @@ const ProductCard = ({ product, onEdit, onDelete, onToggleSelect, isSelected, is
       {/* Product details */}
       <View style={styles.detailsRow}>
         <View style={styles.detailItem}>
-          <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Price</Text>
-          <Text style={[styles.detailValue, { color: colors.text }]}>
+          <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>
+            {product.discount > 0 ? 'Original Price' : 'Price'}
+          </Text>
+          <Text style={[styles.detailValue, { color: colors.text, textDecorationLine: product.discount > 0 ? 'line-through' : 'none' }]}>
             {formatPrice(product.price)}
           </Text>
+          {product.discount > 0 && (
+            <>
+              <Text style={[styles.discountBadge, { color: colors.success }]}>
+                -{product.discount}% OFF
+              </Text>
+              <Text style={[styles.finalPrice, { color: colors.success }]}>
+                {formatPrice(product.finalPrice)}
+              </Text>
+            </>
+          )}
         </View>
 
         <View style={styles.detailItem}>
@@ -52,6 +64,16 @@ const ProductCard = ({ product, onEdit, onDelete, onToggleSelect, isSelected, is
           </Text>
         </View>
       </View>
+
+      {/* Notes */}
+      {product.notes && (
+        <View style={[styles.notesContainer, { backgroundColor: colors.inputBackground }]}>
+          <Text style={[styles.notesLabel, { color: colors.textSecondary }]}>📝 Notes:</Text>
+          <Text style={[styles.notesText, { color: colors.text }]} numberOfLines={2}>
+            {product.notes}
+          </Text>
+        </View>
+      )}
 
       {/* Unit price - highlighted */}
       <View style={[styles.unitPriceContainer, { backgroundColor: colors.secondary + '20' }]}>
@@ -179,6 +201,30 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '600',
     fontSize: 14,
+  },
+  discountBadge: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    marginTop: 2,
+  },
+  finalPrice: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 2,
+  },
+  notesContainer: {
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  notesLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  notesText: {
+    fontSize: 13,
+    lineHeight: 18,
   },
 });
 
