@@ -116,7 +116,9 @@ export const CURRENCIES = [
 ];
 
 export const CurrencyProvider = ({ children }) => {
-  const [currency, setCurrency] = useState(CURRENCIES[0]); // Default to USD
+  const [currency, setCurrency] = useState(
+    CURRENCIES.find(c => c.code === 'USD') || CURRENCIES[0]
+  ); // Default to USD
 
   // Load currency from AsyncStorage on mount
   useEffect(() => {

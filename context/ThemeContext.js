@@ -16,6 +16,7 @@ export const useTheme = () => {
 // Theme Provider component that wraps the entire app
 export const ThemeProvider = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isThemeLoaded, setIsThemeLoaded] = useState(false);
 
   // Load theme preference from AsyncStorage on app start
   useEffect(() => {
@@ -30,6 +31,8 @@ export const ThemeProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Error loading theme:', error);
+    } finally {
+      setIsThemeLoaded(true);
     }
   };
 
@@ -47,6 +50,7 @@ export const ThemeProvider = ({ children }) => {
   // Define color schemes for light and dark modes
   const theme = {
     isDarkMode,
+    isThemeLoaded,
     toggleTheme,
     colors: {
       // Background colors

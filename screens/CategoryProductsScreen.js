@@ -289,7 +289,7 @@ const CategoryProductsScreen = ({ navigation, route }) => {
                 {/* Price Range Filter */}
                 <View style={styles.filterSection}>
                   <Text style={[styles.filterLabel, { color: colors.text }]}>
-                    💰 Price Range
+                    Price Range
                   </Text>
                   
                   <View style={styles.priceRangeContainer}>
@@ -485,7 +485,7 @@ const styles = StyleSheet.create({
   modalContent: {
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    maxHeight: '80%',
+    minHeight: 400,
     elevation: 5,
   },
   modalHeader: {
@@ -530,9 +530,9 @@ const styles = StyleSheet.create({
   priceInput: {
     borderWidth: 1,
     borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    fontSize: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    fontSize: 18,
   },
   priceSeparator: {
     fontSize: 14,
@@ -548,7 +548,7 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     flex: 1,
-    paddingVertical: 14,
+    paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
   },

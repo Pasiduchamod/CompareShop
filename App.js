@@ -23,14 +23,9 @@ const Stack = createStackNavigator();
 
 // App Navigator Component
 const AppNavigator = () => {
-  const { isDarkMode, colors } = useTheme();
+  const { isDarkMode, colors, isThemeLoaded } = useTheme();
   const [showWelcome, setShowWelcome] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(null);
-
-  // Check if onboarding has been completed
-  useEffect(() => {
-    checkOnboarding();
-  }, []);
 
   const checkOnboarding = async () => {
     try {
@@ -41,6 +36,16 @@ const AppNavigator = () => {
       setShowOnboarding(false);
     }
   };
+
+  // Check if onboarding has been completed
+  useEffect(() => {
+    checkOnboarding();
+  }, []);
+
+  // Wait for theme to load
+  if (!isThemeLoaded) {
+    return null;
+  }
 
   // Show onboarding first if it's the first launch
   if (showOnboarding === null) {
@@ -54,7 +59,15 @@ const AppNavigator = () => {
 
   // If welcome screen is still showing, render it
   if (showWelcome) {
-    return <WelcomeScreen onFinish={() => setShowWelcome(false)} />;
+    return (
+      <>
+        <StatusBar 
+          style={isDarkMode ? 'light' : 'dark'} 
+          backgroundColor={colors.background}
+        />
+        <WelcomeScreen onFinish={() => setShowWelcome(false)} />
+      </>
+    );
   }
 
   return (
