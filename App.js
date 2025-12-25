@@ -1,13 +1,15 @@
 import 'react-native-gesture-handler';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { ProductProvider } from './context/ProductContext';
 import { CurrencyProvider } from './context/CurrencyContext';
 import WelcomeScreen from './screens/WelcomeScreen';
+import OnboardingScreen from './screens/OnboardingScreen';
 
 // Import Screens
 import HomeScreen from './screens/HomeScreen';
@@ -23,6 +25,32 @@ const Stack = createStackNavigator();
 const AppNavigator = () => {
   const { isDarkMode, colors } = useTheme();
   const [showWelcome, setShowWelcome] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(null);
+
+  // Check if onboarding has been completed
+  useEffect(() => {
+    checkOnboarding();
+  }, []);
+
+  const checkOnboarding = async () => {
+    try {
+      const hasCompletedOnboarding = await AsyncStorage.getItem('@onboarding_completed');
+      setShowOnboarding(hasCompletedOnboarding === null);
+    } catch (error) {
+      console.error('Error checking onboarding status:', error);
+      setShowOnboarding(false);
+    }
+  };
+
+  // Show onboarding first if it's the first launch
+  if (showOnboarding === null) {
+    // Still checking, return null or a loading screen
+    return null;
+  }
+
+  if (showOnboarding) {
+    return <OnboardingScreen onFinish={() => setShowOnboarding(false)} />;
+  }
 
   // If welcome screen is still showing, render it
   if (showWelcome) {

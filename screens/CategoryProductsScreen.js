@@ -212,7 +212,8 @@ const CategoryProductsScreen = ({ navigation, route }) => {
         keyExtractor={item => item.id}
         contentContainerStyle={[
           styles.listContent,
-          filteredProducts.length === 0 && styles.listContentEmpty
+          filteredProducts.length === 0 && styles.listContentEmpty,
+          { paddingBottom: selectedProducts.length > 0 ? 120 : 100 }
         ]}
         ListEmptyComponent={renderEmptyState}
       />

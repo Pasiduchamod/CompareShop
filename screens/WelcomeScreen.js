@@ -23,10 +23,16 @@ const WelcomeScreen = ({ onFinish }) => {
       }),
     ]).start();
 
-    // Auto close after 2 seconds
+    // Wait 3 seconds, then fade out before closing
     const timer = setTimeout(() => {
-      onFinish();
-    }, 2000);
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }).start(() => {
+        onFinish();
+      });
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, []);
