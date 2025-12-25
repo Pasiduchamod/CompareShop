@@ -8,7 +8,9 @@ import {
   Alert,
   TextInput,
   Modal,
-  ScrollView
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
@@ -263,83 +265,94 @@ const CategoryProductsScreen = ({ navigation, route }) => {
         animationType="slide"
         onRequestClose={() => setShowFilters(false)}
       >
-      <View style={styles.modalOverlay}>
-        <View style={[styles.modalContent, { backgroundColor: colors.cardBackground }]}>
-          <View style={styles.modalHeader}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>
-              Filter Products
-            </Text>
-            <TouchableOpacity onPress={() => setShowFilters(false)}>
-              <Text style={[styles.modalClose, { color: colors.textSecondary }]}>✕</Text>
-            </TouchableOpacity>
-          </View>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.modalOverlay}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlayTouchable} 
+          activeOpacity={1} 
+          onPress={() => setShowFilters(false)}
+        >
+          <TouchableOpacity activeOpacity={1} onPress={(e) => e.stopPropagation()}>
+            <View style={[styles.modalContent, { backgroundColor: colors.cardBackground }]}>
+              <View style={styles.modalHeader}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>
+                  Filter Products
+                </Text>
+                <TouchableOpacity onPress={() => setShowFilters(false)}>
+                  <Text style={[styles.modalClose, { color: colors.textSecondary }]}>✕</Text>
+                </TouchableOpacity>
+              </View>
 
-          <ScrollView style={styles.modalBody}>
-            {/* Price Range Filter */}
-            <View style={styles.filterSection}>
-              <Text style={[styles.filterLabel, { color: colors.text }]}>
-                💰 Price Range
-              </Text>
-              
-              <View style={styles.priceRangeContainer}>
-                <View style={styles.priceInputWrapper}>
-                  <Text style={[styles.priceLabel, { color: colors.textSecondary }]}>Min Price</Text>
-                  <TextInput
-                    style={[styles.priceInput, { 
-                      backgroundColor: colors.inputBackground,
-                      borderColor: colors.inputBorder,
-                      color: colors.text
-                    }]}
-                    placeholder="0.00"
-                    placeholderTextColor={colors.textSecondary}
-                    keyboardType="numeric"
-                    value={minPrice}
-                    onChangeText={setMinPrice}
-                  />
+              <ScrollView style={styles.modalBody} keyboardShouldPersistTaps="handled">
+                {/* Price Range Filter */}
+                <View style={styles.filterSection}>
+                  <Text style={[styles.filterLabel, { color: colors.text }]}>
+                    💰 Price Range
+                  </Text>
+                  
+                  <View style={styles.priceRangeContainer}>
+                    <View style={styles.priceInputWrapper}>
+                      <Text style={[styles.priceLabel, { color: colors.textSecondary }]}>Min Price</Text>
+                      <TextInput
+                        style={[styles.priceInput, { 
+                          backgroundColor: colors.inputBackground,
+                          borderColor: colors.inputBorder,
+                          color: colors.text
+                        }]}
+                        placeholder="0.00"
+                        placeholderTextColor={colors.textSecondary}
+                        keyboardType="numeric"
+                        value={minPrice}
+                        onChangeText={setMinPrice}
+                      />
+                    </View>
+
+                    <Text style={[styles.priceSeparator, { color: colors.textSecondary }]}>to</Text>
+
+                    <View style={styles.priceInputWrapper}>
+                      <Text style={[styles.priceLabel, { color: colors.textSecondary }]}>Max Price</Text>
+                      <TextInput
+                        style={[styles.priceInput, { 
+                          backgroundColor: colors.inputBackground,
+                          borderColor: colors.inputBorder,
+                          color: colors.text
+                        }]}
+                        placeholder="999.99"
+                        placeholderTextColor={colors.textSecondary}
+                        keyboardType="numeric"
+                        value={maxPrice}
+                        onChangeText={setMaxPrice}
+                      />
+                    </View>
+                  </View>
                 </View>
+              </ScrollView>
 
-                <Text style={[styles.priceSeparator, { color: colors.textSecondary }]}>to</Text>
-
-                <View style={styles.priceInputWrapper}>
-                  <Text style={[styles.priceLabel, { color: colors.textSecondary }]}>Max Price</Text>
-                  <TextInput
-                    style={[styles.priceInput, { 
-                      backgroundColor: colors.inputBackground,
-                      borderColor: colors.inputBorder,
-                      color: colors.text
-                    }]}
-                    placeholder="999.99"
-                    placeholderTextColor={colors.textSecondary}
-                    keyboardType="numeric"
-                    value={maxPrice}
-                    onChangeText={setMaxPrice}
-                  />
-                </View>
+              {/* Modal Actions */}
+              <View style={styles.modalActions}>
+                <TouchableOpacity
+                  onPress={handleClearFilters}
+                  style={[styles.modalButton, styles.clearButton, { backgroundColor: colors.inputBackground }]}
+                >
+                  <Text style={[styles.modalButtonText, { color: colors.text }]}>
+                    Clear All
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setShowFilters(false)}
+                  style={[styles.modalButton, styles.applyButton, { backgroundColor: colors.primary }]}
+                >
+                  <Text style={[styles.modalButtonText, { color: '#FFFFFF' }]}>
+                    Apply Filters
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
-          </ScrollView>
-
-          {/* Modal Actions */}
-          <View style={styles.modalActions}>
-            <TouchableOpacity
-              onPress={handleClearFilters}
-              style={[styles.modalButton, styles.clearButton, { backgroundColor: colors.inputBackground }]}
-            >
-              <Text style={[styles.modalButtonText, { color: colors.text }]}>
-                Clear All
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setShowFilters(false)}
-              style={[styles.modalButton, styles.applyButton, { backgroundColor: colors.primary }]}
-            >
-              <Text style={[styles.modalButtonText, { color: '#FFFFFF' }]}>
-                Apply Filters
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
     </Modal>
     </View>
   );
@@ -463,6 +476,10 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalOverlayTouchable: {
+    flex: 1,
     justifyContent: 'flex-end',
   },
   modalContent: {
