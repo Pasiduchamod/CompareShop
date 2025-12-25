@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   View, 
   Text, 
   FlatList, 
   TouchableOpacity, 
   StyleSheet, 
-  Alert 
+  Alert,
+  TextInput,
+  Modal,
+  ScrollView
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useProducts } from '../context/ProductContext';
+import { useCurrency } from '../context/CurrencyContext';
 import Header from '../components/Header';
 import ProductCard from '../components/ProductCard';
 
@@ -17,7 +21,12 @@ import ProductCard from '../components/ProductCard';
 const CategoryProductsScreen = ({ navigation, route }) => {
   const { category } = route.params;
   const { colors } = useTheme();
+  const { currency } = useCurrency();
   const insets = useSafeAreaInsets();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
   const { 
     getCategoryProducts,
     deleteProduct, 
@@ -28,6 +37,44 @@ const CategoryProductsScreen = ({ navigation, route }) => {
   } = useProducts();
 
   const products = getCategoryProducts(category.id);
+
+  // Filter and search products
+  const filteredProducts = useMemo(() => {
+    let filtered = [...products];
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(product => 
+        (product.brand && product.brand.toLowerCase().includes(query)) ||
+        (product.notes && product.notes.toLowerCase().includes(query))
+      );
+    }
+
+    // Price range filter
+    if (minPrice !== '' || maxPrice !== '') {
+      const min = minPrice === '' ? 0 : parseFloat(minPrice) || 0;
+      const max = maxPrice === '' ? Infinity : parseFloat(maxPrice) || Infinity;
+      
+      filtered = filtered.filter(product => {
+        // Use finalPrice if available (after discount), otherwise use price
+        const productPrice = product.finalPrice !== undefined ? product.finalPrice : product.price;
+        return productPrice >= min && productPrice <= max;
+      });
+    }
+
+    return filtered;
+  }, [products, searchQuery, minPrice, maxPrice]);
+
+  // Clear all filters
+  const handleClearFilters = () => {
+    setMinPrice('');
+    setMaxPrice('');
+    setShowFilters(false);
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = minPrice !== '' || maxPrice !== '';
 
   // Navigate to Add Product screen
   const handleAddProduct = () => {
@@ -121,14 +168,51 @@ const CategoryProductsScreen = ({ navigation, route }) => {
       {/* Header */}
       <Header title={category.name} />
 
+      {/* Search Bar */}
+      <View style={[styles.searchContainer, { backgroundColor: colors.cardBackground, borderBottomColor: colors.border }]}>
+        <View style={[styles.searchInputContainer, { backgroundColor: colors.inputBackground }]}>
+          <Text style={styles.searchIcon}>🔍</Text>
+          <TextInput
+            style={[styles.searchInput, { color: colors.text }]}
+            placeholder="Search by brand or notes..."
+            placeholderTextColor={colors.textSecondary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery !== '' && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <Text style={styles.clearIcon}>✕</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+        <TouchableOpacity 
+          style={[styles.filterButton, { backgroundColor: hasActiveFilters ? colors.primary : colors.inputBackground }]}
+          onPress={() => setShowFilters(true)}
+        >
+          <Text style={[styles.filterIcon, { color: hasActiveFilters ? '#FFFFFF' : colors.text }]}>⚙</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Active filters indicator */}
+      {hasActiveFilters && (
+        <View style={[styles.activeFiltersBar, { backgroundColor: colors.primary + '20' }]}>
+          <Text style={[styles.activeFiltersText, { color: colors.primary }]}>
+            Filters active: {minPrice && `Min ${currency.symbol}${minPrice}`}{minPrice && maxPrice && ' | '}{maxPrice && `Max ${currency.symbol}${maxPrice}`}
+          </Text>
+          <TouchableOpacity onPress={handleClearFilters}>
+            <Text style={[styles.clearFiltersText, { color: colors.primary }]}>Clear</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {/* Products list */}
       <FlatList
-        data={products}
+        data={filteredProducts}
         renderItem={renderProduct}
         keyExtractor={item => item.id}
         contentContainerStyle={[
           styles.listContent,
-          products.length === 0 && styles.listContentEmpty
+          filteredProducts.length === 0 && styles.listContentEmpty
         ]}
         ListEmptyComponent={renderEmptyState}
       />
@@ -170,6 +254,92 @@ const CategoryProductsScreen = ({ navigation, route }) => {
           </View>
         </View>
       )}
+
+      {/* Filter Modal */}
+      <Modal
+        visible={showFilters}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowFilters(false)}
+      >
+      <View style={styles.modalOverlay}>
+        <View style={[styles.modalContent, { backgroundColor: colors.cardBackground }]}>
+          <View style={styles.modalHeader}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>
+              Filter Products
+            </Text>
+            <TouchableOpacity onPress={() => setShowFilters(false)}>
+              <Text style={[styles.modalClose, { color: colors.textSecondary }]}>✕</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView style={styles.modalBody}>
+            {/* Price Range Filter */}
+            <View style={styles.filterSection}>
+              <Text style={[styles.filterLabel, { color: colors.text }]}>
+                💰 Price Range
+              </Text>
+              
+              <View style={styles.priceRangeContainer}>
+                <View style={styles.priceInputWrapper}>
+                  <Text style={[styles.priceLabel, { color: colors.textSecondary }]}>Min Price</Text>
+                  <TextInput
+                    style={[styles.priceInput, { 
+                      backgroundColor: colors.inputBackground,
+                      borderColor: colors.inputBorder,
+                      color: colors.text
+                    }]}
+                    placeholder="0.00"
+                    placeholderTextColor={colors.textSecondary}
+                    keyboardType="numeric"
+                    value={minPrice}
+                    onChangeText={setMinPrice}
+                  />
+                </View>
+
+                <Text style={[styles.priceSeparator, { color: colors.textSecondary }]}>to</Text>
+
+                <View style={styles.priceInputWrapper}>
+                  <Text style={[styles.priceLabel, { color: colors.textSecondary }]}>Max Price</Text>
+                  <TextInput
+                    style={[styles.priceInput, { 
+                      backgroundColor: colors.inputBackground,
+                      borderColor: colors.inputBorder,
+                      color: colors.text
+                    }]}
+                    placeholder="999.99"
+                    placeholderTextColor={colors.textSecondary}
+                    keyboardType="numeric"
+                    value={maxPrice}
+                    onChangeText={setMaxPrice}
+                  />
+                </View>
+              </View>
+            </View>
+          </ScrollView>
+
+          {/* Modal Actions */}
+          <View style={styles.modalActions}>
+            <TouchableOpacity
+              onPress={handleClearFilters}
+              style={[styles.modalButton, styles.clearButton, { backgroundColor: colors.inputBackground }]}
+            >
+              <Text style={[styles.modalButtonText, { color: colors.text }]}>
+                Clear All
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setShowFilters(false)}
+              style={[styles.modalButton, styles.applyButton, { backgroundColor: colors.primary }]}
+            >
+              <Text style={[styles.modalButtonText, { color: '#FFFFFF' }]}>
+                Apply Filters
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
     </View>
   );
 };
@@ -235,6 +405,145 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    padding: 12,
+    gap: 8,
+    borderBottomWidth: 1,
+  },
+  searchInputContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 12,
+  },
+  searchIcon: {
+    fontSize: 18,
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+  },
+  clearIcon: {
+    fontSize: 16,
+    color: '#9CA3AF',
+    paddingHorizontal: 8,
+  },
+  filterButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  filterIcon: {
+    fontSize: 20,
+  },
+  activeFiltersBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  activeFiltersText: {
+    fontSize: 12,
+    fontWeight: '600',
+    flex: 1,
+  },
+  clearFiltersText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '80%',
+    elevation: 5,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  modalClose: {
+    fontSize: 24,
+    fontWeight: '300',
+  },
+  modalBody: {
+    padding: 20,
+  },
+  filterSection: {
+    marginBottom: 24,
+  },
+  filterLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  priceRangeContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 12,
+  },
+  priceInputWrapper: {
+    flex: 1,
+  },
+  priceLabel: {
+    fontSize: 12,
+    marginBottom: 6,
+  },
+  priceInput: {
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    fontSize: 16,
+  },
+  priceSeparator: {
+    fontSize: 14,
+    marginBottom: 12,
+    paddingHorizontal: 4,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 12,
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  clearButton: {
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  applyButton: {
+    elevation: 2,
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
   },
   fab: {
     position: 'absolute',
