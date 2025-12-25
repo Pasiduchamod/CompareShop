@@ -3,6 +3,7 @@ import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { ProductProvider } from './context/ProductContext';
 import { CurrencyProvider } from './context/CurrencyContext';
@@ -19,12 +20,27 @@ const Stack = createStackNavigator();
 
 // App Navigator Component
 const AppNavigator = () => {
-  const { isDarkMode } = useTheme();
+  const { isDarkMode, colors } = useTheme();
 
   return (
     <>
-      <StatusBar style={isDarkMode ? 'light' : 'dark'} />
-      <NavigationContainer>
+      <StatusBar 
+        style={isDarkMode ? 'light' : 'dark'} 
+        backgroundColor={colors.background}
+      />
+      <NavigationContainer
+        theme={{
+          dark: isDarkMode,
+          colors: {
+            primary: colors.primary,
+            background: colors.background,
+            card: colors.cardBackground,
+            text: colors.text,
+            border: colors.border,
+            notification: colors.primary,
+          },
+        }}
+      >
         <Stack.Navigator
           screenOptions={{
             headerShown: false, // We use custom headers
@@ -73,16 +89,18 @@ const AppNavigator = () => {
 // Main App Component
 export default function App() {
   return (
-    // Wrap app with Context Providers
-    // ThemeProvider: Manages dark mode and color themes
-    // ProductProvider: Manages products state and operations
-    // CurrencyProvider: Manages currency selection
-    <ThemeProvider>
-      <CurrencyProvider>
-        <ProductProvider>
-          <AppNavigator />
-        </ProductProvider>
-      </CurrencyProvider>
-    </ThemeProvider>
+    <SafeAreaProvider>
+      {/* Wrap app with Context Providers */}
+      {/* ThemeProvider: Manages dark mode and color themes */}
+      {/* ProductProvider: Manages products state and operations */}
+      {/* CurrencyProvider: Manages currency selection */}
+      <ThemeProvider>
+        <CurrencyProvider>
+          <ProductProvider>
+            <AppNavigator />
+          </ProductProvider>
+        </CurrencyProvider>
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

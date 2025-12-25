@@ -34,7 +34,7 @@ const Header = ({ title, rightButton, onRightButtonPress }) => {
             onPress={() => setShowCurrencyPicker(true)}
             style={[styles.iconButton, { backgroundColor: colors.inputBackground }]}
           >
-            <Text style={styles.icon}>{currency.symbol}</Text>
+            <Text style={[styles.icon, { color: colors.text }]}>{currency.symbol}</Text>
           </TouchableOpacity>
 
           {/* Dark mode toggle */}
@@ -51,7 +51,7 @@ const Header = ({ title, rightButton, onRightButtonPress }) => {
               onPress={rightButton.onPress || onRightButtonPress}
               style={[styles.iconButton, { backgroundColor: 'transparent', borderWidth: 2, borderColor: colors.border }]}
             >
-              <Text style={styles.icon}>{rightButton.icon || rightButton}</Text>
+              <Text style={[styles.icon, { color: colors.text }]}>{rightButton.icon || rightButton}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -117,8 +117,8 @@ const Header = ({ title, rightButton, onRightButtonPress }) => {
 
 const styles = StyleSheet.create({
   header: {
-    paddingTop: 50,
-    paddingBottom: 15,
+    paddingTop: 65,
+    paddingBottom: 20,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
     elevation: 4,
