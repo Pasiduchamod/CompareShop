@@ -184,7 +184,7 @@ export const ProductProvider = ({ children }) => {
   };
 
   // Format unit price for display
-  const formatUnitPrice = (unitPrice, unit) => {
+  const formatUnitPrice = (unitPrice, unit, currencySymbol = '$') => {
     let displayUnit = '';
     switch(unit.toLowerCase()) {
       case 'kg':
@@ -201,7 +201,7 @@ export const ProductProvider = ({ children }) => {
       default:
         displayUnit = '/unit';
     }
-    return `$${unitPrice.toFixed(4)}${displayUnit}`;
+    return `${currencySymbol}${unitPrice.toFixed(4)}${displayUnit}`;
   };
 
   const value = {

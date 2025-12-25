@@ -2,11 +2,13 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useProducts } from '../context/ProductContext';
+import { useCurrency } from '../context/CurrencyContext';
 
 // ProductCard component to display individual product information
 const ProductCard = ({ product, onEdit, onDelete, onToggleSelect, isSelected, isBestValue, categoryName }) => {
   const { colors } = useTheme();
   const { formatUnitPrice } = useProducts();
+  const { formatPrice, currency } = useCurrency();
 
   return (
     <TouchableOpacity 
@@ -39,7 +41,7 @@ const ProductCard = ({ product, onEdit, onDelete, onToggleSelect, isSelected, is
         <View style={styles.detailItem}>
           <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Price</Text>
           <Text style={[styles.detailValue, { color: colors.text }]}>
-            ${product.price.toFixed(2)}
+            {formatPrice(product.price)}
           </Text>
         </View>
 
@@ -55,7 +57,7 @@ const ProductCard = ({ product, onEdit, onDelete, onToggleSelect, isSelected, is
       <View style={[styles.unitPriceContainer, { backgroundColor: colors.secondary + '20' }]}>
         <Text style={[styles.unitPriceLabel, { color: colors.textSecondary }]}>Unit Price</Text>
         <Text style={[styles.unitPrice, { color: colors.secondary }]}>
-          {formatUnitPrice(product.unitPrice, product.unit)}
+          {formatUnitPrice(product.unitPrice, product.unit, currency.symbol)}
         </Text>
       </View>
 

@@ -10,6 +10,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useProducts } from '../context/ProductContext';
+import { useCurrency } from '../context/CurrencyContext';
 import Header from '../components/Header';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -20,6 +21,7 @@ const ComparisonScreen = ({ navigation, route }) => {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const { getSelectedProductsData, formatUnitPrice, clearSelection } = useProducts();
+  const { formatPrice, currency } = useCurrency();
   
   const selectedProducts = getSelectedProductsData(categoryId);
   
@@ -79,7 +81,7 @@ const ComparisonScreen = ({ navigation, route }) => {
         <View style={styles.priceSection}>
           <Text style={[styles.priceLabel, { color: colors.textSecondary }]}>Total Price</Text>
           <Text style={[styles.priceValue, { color: colors.text }]}>
-            ${product.price.toFixed(2)}
+            {formatPrice(product.price)}
           </Text>
         </View>
 
@@ -106,7 +108,7 @@ const ComparisonScreen = ({ navigation, route }) => {
             styles.unitPriceValue, 
             { color: isBestValue ? colors.primary : colors.text }
           ]}>
-            {formatUnitPrice(product.unitPrice, product.unit)}
+            {formatUnitPrice(product.unitPrice, product.unit, currency.symbol)}
           </Text>
         </View>
 
@@ -117,7 +119,7 @@ const ComparisonScreen = ({ navigation, route }) => {
               Save {savingsPercent}%
             </Text>
             <Text style={[styles.savingsAmount, { color: colors.textSecondary }]}>
-              ${savings.toFixed(4)}/unit cheaper
+              {formatPrice(savings, 4)}/unit cheaper
             </Text>
           </View>
         ) : (

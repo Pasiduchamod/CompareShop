@@ -12,12 +12,14 @@ import {
 } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useProducts } from '../context/ProductContext';
+import { useCurrency } from '../context/CurrencyContext';
 import Header from '../components/Header';
 
 // Add/Edit Product Screen
 const AddProductScreen = ({ navigation, route }) => {
   const { colors } = useTheme();
   const { addProduct, updateProduct } = useProducts();
+  const { currency, formatPrice } = useCurrency();
   
   // Get category and product from route params
   const { categoryId, categoryName, product: productToEdit } = route.params;
@@ -79,7 +81,7 @@ const AddProductScreen = ({ navigation, route }) => {
         break;
     }
     
-    return `$${unitPrice.toFixed(4)}${displayUnit}`;
+    return `${formatPrice(unitPrice, 4)}${displayUnit}`;
   };
 
   // Validate and save product
@@ -154,7 +156,7 @@ const AddProductScreen = ({ navigation, route }) => {
           {/* Price */}
           <View style={styles.inputGroup}>
             <Text style={[styles.label, { color: colors.text }]}>
-              Price ($) *
+              Price ({currency.symbol}) *
             </Text>
             <TextInput
               style={[

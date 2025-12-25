@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { ProductProvider } from './context/ProductContext';
+import { CurrencyProvider } from './context/CurrencyContext';
 
 // Import Screens
 import HomeScreen from './screens/HomeScreen';
@@ -68,10 +69,13 @@ export default function App() {
     // Wrap app with Context Providers
     // ThemeProvider: Manages dark mode and color themes
     // ProductProvider: Manages products state and operations
+    // CurrencyProvider: Manages currency selection
     <ThemeProvider>
-      <ProductProvider>
-        <AppNavigator />
-      </ProductProvider>
+      <CurrencyProvider>
+        <ProductProvider>
+          <AppNavigator />
+        </ProductProvider>
+      </CurrencyProvider>
     </ThemeProvider>
   );
 }
