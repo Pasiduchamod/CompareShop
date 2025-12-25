@@ -72,14 +72,14 @@ const ProductCard = ({ product, onEdit, onDelete, onToggleSelect, isSelected, is
           onPress={onEdit}
           style={[styles.actionButton, { backgroundColor: colors.secondary }]}
         >
-          <Text style={styles.actionButtonText}>✏️ Edit</Text>
+          <Text style={styles.actionButtonText}>Edit</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
           onPress={onDelete}
           style={[styles.actionButton, { backgroundColor: colors.buttonDanger }]}
         >
-          <Text style={styles.actionButtonText}>🗑️ Delete</Text>
+          <Text style={styles.actionButtonText}>Delete</Text>
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
