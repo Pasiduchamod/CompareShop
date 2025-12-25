@@ -4,7 +4,7 @@
     "slug": "compareshop",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/Logo/logo.png",
+    "icon": "./assets/Logo/icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/Logo/logo.png",
@@ -15,16 +15,24 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.compareshop.app"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/Logo/logo.png",
+        "foregroundImage": "./assets/Logo/icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.compareshop.app",
+      "versionCode": 1
     },
     "web": {
-      "favicon": "./assets/Logo/logo.png"
+      "favicon": "./assets/Logo/icon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c2fdf930-ac02-4b5b-a098-2e031794e8be"
+      }
     }
   }
 }
