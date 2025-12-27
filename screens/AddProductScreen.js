@@ -126,14 +126,20 @@ const AddProductScreen = ({ navigation, route }) => {
 
   return (
     <KeyboardAvoidingView 
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      style={{ flex: 1, backgroundColor: colors.background }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={0}
     >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         {/* Header */}
         <Header title={isEditing ? `Edit ${categoryName}` : `Add ${categoryName}`} />
 
-        <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
+        <ScrollView 
+          style={styles.content} 
+          contentContainerStyle={styles.contentContainer}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={true}
+        >
           {/* Info Banner */}
           <View style={[styles.infoBanner, { backgroundColor: colors.secondary + '15', borderColor: colors.secondary }]}>
             <Text style={[styles.infoBannerText, { color: colors.text }]}>
@@ -338,6 +344,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 20,
+    paddingBottom: 100,
   },
   infoBanner: {
     padding: 12,

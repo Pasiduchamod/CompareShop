@@ -477,16 +477,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
+    zIndex: 9999,
   },
   modalOverlayTouchable: {
     flex: 1,
     justifyContent: 'flex-end',
+    zIndex: 9999,
   },
   modalContent: {
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     minHeight: 400,
-    elevation: 5,
+    elevation: 10,
+    zIndex: 10000,
   },
   modalHeader: {
     flexDirection: 'row',

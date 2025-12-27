@@ -6,24 +6,19 @@
     "orientation": "portrait",
     "icon": "./assets/Logo/icon.png",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/Logo/logo.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.compareshop.app"
+      "bundleIdentifier": "lk.pasiduchamod.compareshop"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/Logo/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.compareshop.app",
+      "package": "lk.pasiduchamod.compareshop",
       "versionCode": 1
     },
     "web": {
