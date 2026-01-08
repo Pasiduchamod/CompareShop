@@ -1,18 +1,31 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, FlatList, TextInput } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { showReviewPrompt } from '../utils/reviewPrompt';
 
 // Header component with logo and optional actions
 const Header = ({ title, rightButton, onRightButtonPress }) => {
   const { colors, isDarkMode, toggleTheme } = useTheme();
   const { currency, currencies, changeCurrency } = useCurrency();
   const [showCurrencyPicker, setShowCurrencyPicker] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleCurrencySelect = (currencyCode) => {
     changeCurrency(currencyCode);
     setShowCurrencyPicker(false);
+    setSearchQuery('');
   };
+
+  // Filter currencies based on search query
+  const filteredCurrencies = currencies.filter(item => {
+    const query = searchQuery.toLowerCase();
+    return (
+      item.code.toLowerCase().includes(query) ||
+      item.name.toLowerCase().includes(query) ||
+      item.symbol.includes(query)
+    );
+  });
 
   return (
     <View style={[styles.header, { backgroundColor: colors.cardBackground, borderBottomColor: colors.border }]}>
@@ -29,6 +42,14 @@ const Header = ({ title, rightButton, onRightButtonPress }) => {
         
         {/* Right side actions */}
         <View style={styles.rightActions}>
+          {/* Rate Us button */}
+          <TouchableOpacity 
+            onPress={showReviewPrompt}
+            style={[styles.iconButton, { backgroundColor: colors.inputBackground }]}
+          >
+            <Text style={styles.icon}>⭐</Text>
+          </TouchableOpacity>
+
           {/* Currency selector */}
           <TouchableOpacity 
             onPress={() => setShowCurrencyPicker(true)}
@@ -62,15 +83,36 @@ const Header = ({ title, rightButton, onRightButtonPress }) => {
         visible={showCurrencyPicker}
         transparent={true}
         animationType="fade"
-        onRequestClose={() => setShowCurrencyPicker(false)}
+        onRequestClose={() => {
+          setShowCurrencyPicker(false);
+          setSearchQuery('');
+        }}
       >
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.cardBackground }]}>
             <Text style={[styles.modalTitle, { color: colors.text }]}>
               Select Currency
             </Text>
+            
+            {/* Search Bar */}
+            <View style={[styles.searchContainer, { backgroundColor: colors.inputBackground, borderColor: colors.inputBorder }]}>
+              <Text style={styles.searchIcon}>🔍</Text>
+              <TextInput
+                style={[styles.searchInput, { color: colors.text }]}
+                placeholder="Search currency..."
+                placeholderTextColor={colors.textSecondary}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+              {searchQuery !== '' && (
+                <TouchableOpacity onPress={() => setSearchQuery('')}>
+                  <Text style={[styles.clearIcon, { color: colors.textSecondary }]}>✕</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+            
             <FlatList
-              data={currencies}
+              data={filteredCurrencies}
               keyExtractor={(item) => item.code}
               renderItem={({ item }) => (
                 <TouchableOpacity
@@ -179,6 +221,28 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 16,
+  },
+  searchIcon: {
+    fontSize: 18,
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    padding: 0,
+  },
+  clearIcon: {
+    fontSize: 18,
+    padding: 4,
   },
   currencyItem: {
     flexDirection: 'row',

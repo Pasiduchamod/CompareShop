@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -12,6 +12,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useProducts } from '../context/ProductContext';
 import { useCurrency } from '../context/CurrencyContext';
 import Header from '../components/Header';
+import { trackComparison } from '../utils/reviewPrompt';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -32,6 +33,13 @@ const ComparisonScreen = ({ navigation, route }) => {
       )
     : null;
   const bestValueId = bestValueProduct ? bestValueProduct.id : null;
+
+  // Track comparison view for review prompt
+  useEffect(() => {
+    if (selectedProducts.length >= 2) {
+      trackComparison();
+    }
+  }, []);
 
   // Calculate max price for savings
   const maxUnitPrice = selectedProducts.length > 0 ? Math.max(...selectedProducts.map(p => p.unitPrice)) : 0;

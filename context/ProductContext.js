@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { trackProductAdded } from '../utils/reviewPrompt';
 
 const ProductContext = createContext();
 
@@ -100,6 +101,9 @@ export const ProductProvider = ({ children }) => {
         ? { ...cat, products: [...cat.products, newProduct] }
         : cat
     ));
+    
+    // Track product added for review prompt
+    trackProductAdded();
   };
 
   // Update a product

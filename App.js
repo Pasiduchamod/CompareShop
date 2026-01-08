@@ -1,6 +1,7 @@
 import 'react-native-gesture-handler';
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { View, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -10,6 +11,7 @@ import { ProductProvider } from './context/ProductContext';
 import { CurrencyProvider } from './context/CurrencyContext';
 import WelcomeScreen from './screens/WelcomeScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
+import { trackAppLaunch } from './utils/reviewPrompt';
 
 // Import Screens
 import HomeScreen from './screens/HomeScreen';
@@ -40,11 +42,16 @@ const AppNavigator = () => {
   // Check if onboarding has been completed
   useEffect(() => {
     checkOnboarding();
+    trackAppLaunch(); // Track app launch for review prompt
   }, []);
 
   // Wait for theme to load
   if (!isThemeLoaded) {
-    return null;
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#4CAF50" />
+      </View>
+    );
   }
 
   // Show onboarding first if it's the first launch
